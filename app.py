@@ -20,80 +20,103 @@ def main():
         def __init__(self):
             self.name = ""
             self.money = 0
+            self.hp = 100
 
-        def setName(self, newName):
+        def set_name(self, newName):
             self.name = newName
 
-        def addMoney(self, amount):
+        def add_money(self, amount):
             if isinstance(amount, int):
                 self.money += amount
                 delay_print(
                     f"""
-        {colour.money(40)} added to your wallet!
+        {colour.money(amount)} added to your wallet!
         Current Balance: {colour.money(self.money)}
-"""
+    """
                 )
             else:
                 delay_print("This ain't money...")
 
+        def take_damage(self, amount):
+            self.hp -= amount
+
+
+
     # Creates player instance
     player = PlayerClass()
-    player.setName(enterName())
+    player.set_name(enterName())
     # Player is getting released from jail, and the guard releasing you is
     # trying to be encouraging, but not doing a great job.
     delay_print(
         f"""
 
-{colour.GREEN}JAILER{colour.ENDC}
+        {colour.GREEN}JAILER{colour.ENDC}
         The good news is, you're finally free. You've been locked up for so
         many years, must feel good! The bad news is, this probably isn't the
         world you remember. You don't have a penny to your name, and your
         possessions are worth as much as your wallet.
 
-{colour.BLUE}{player.name}{colour.ENDC}
+        {colour.BLUE}{player.name}{colour.ENDC}
         I have a wallet?!
 
-{colour.GREEN}JAILER{colour.ENDC}
+        {colour.GREEN}JAILER{colour.ENDC}
         Your family felt bad for you though, and they've sent you some money.
         It should be enough to buy yourself lunch.
-"""
-    )
-    player.addMoney(40)
+        """
+         )
+    player.add_money(50)
 
     delay_print(
         f"""
-{colour.CYAN}NARRATOR{colour.ENDC}
+        {colour.CYAN}NARRATOR{colour.ENDC}
         And so, {player.name} leaves the prison that has been home for so long. 
         Where should {player.name} go now?
         """
     )
 
-    showChoices(
+    match showChoices(
         [
             "Lunch sounds like a good idea",
             "Might be a good idea to see the family!",
             "I'm feeling lucky, I'm gonna hit the casino",
         ]
-    )
+    ):
+        case "0":
+            go_for_lunch()
+        case "1":
+            print('see the fam')
+        case "2":
+            print('go for lunch')
+
+
+
+
 
     return None
+
 
 
 # A function which will provide the name for the main func.
 def enterName():
     name = str(
-        input("\nHello Adventurer! What shall I call you?\n")
+        delay_input("\nHello Adventurer! What shall I call you?\n")
     )  # TODO can we make this delay_print? We will probably have to make a delay_input... I couldn't make it work
     delay_print(f"\nWell it's a pleasure to meet you, {name}!")
     return name
 
-
-# Prints things slowly, the LOWER the speed the faster the typing
-def delay_print(str, speed=1):
+def delay_input(str, delay=1):
     for char in str:
         sys.stdout.write(char)
         sys.stdout.flush()
-        time.sleep(speed / 100)
+        time.sleep(delay / 1000)
+    input('')
+
+# Prints things slowly, the LOWER the speed the faster the typing
+def delay_print(str, delay=1):
+    for char in str:
+        sys.stdout.write(char)
+        sys.stdout.flush()
+        time.sleep(delay / 1000)
 
 
 # Shows a list of options, and gives them a number for each. Player must type in a number to make a selection.
@@ -123,7 +146,7 @@ def showChoices(options):
                 showError("Please enter a number greater than 0!")
             if not (answer < len(options)):
                 showError("Please select a number within the range of options!")
-    return
+    return str(answer)
 
 
 # Helper function for displaying errors
@@ -144,6 +167,8 @@ class colour:
 
     def money(amount):
         return f"{colour.YELLOW}${amount}{colour.ENDC}"
+    def damage(amount, str=""):
+        return f"{colour.RED}{amount} {str}{colour.ENDC}"
 
     def demoColours(self):
         print(
@@ -161,6 +186,24 @@ colour Demo
 """
         )
 
+# Weird, I don't remember having to specifically place funcs above their invocation in python.... but putting it below the match case didn't work
+def go_for_lunch():
+    delay_print(f'''
+                You see the allure of the Golden Arches ahead and know you can\'t resist. You are reaching
+                for the door handle when it comes flying into your face. Blood streams down from your nose. 
+                You take {colour.damage(1, 'point of damage')}. The man walks right by you and gets into a black BMW. ''')
+    
+    showChoices(
+        [
+            "Jot down his license plate",
+            "Keep your head down and head in"
+        ]
+        )
+    return None
 
 # End the program with the main function call
 main()
+
+
+
+
