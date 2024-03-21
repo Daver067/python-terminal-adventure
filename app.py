@@ -63,7 +63,7 @@ def main():
                 case "0":
                     return paths['go_for_lunch']()
                 case "1":  # TODO: make game routes
-                    print("see_the_fam")
+                    return paths['see_the_fam']()
                 case "2":     # TODO: make game routes
                     print("go_to_the_rippers")
 
@@ -112,12 +112,46 @@ def main():
         def go_in_restaurant():
             delay_print('you go in the food house')
             return None # TODO: make game routes
+
+
+        def see_the_fam():
+            delay_print(f'''
+            {Colour.CYAN}NARRATOR{Colour.ENDC}
+            {player.name} heads home. It's been many years, but the county roads
+            leading home still feel familiar. The feeling wasn't meant to last
+            though. As {player.name} approached the house, it was all too apparent
+            that the home was deserted.
+            
+            {Colour.GREEN}{player.name}{Colour.ENDC}
+            Hey!
+            Anyone around here or what?
+
+            Ma?
+
+            Pa??
+            
+            Tick? Where are ya?
+
+
+            {Colour.CYAN}NARRATOR{Colour.ENDC}
+            {player.name} hears the sound of a car engine coming up the road.
+            Turning around to face the noise, he sees a black BMW. The driver
+            pulls up close to the house and circles to park facing the way they
+            came. A man wearing a suit emerges from the car. He pulls on each
+            side of his mustache, sequentially. He regards {player.name}.
+            
+            {Colour.GREEN}Mysterious Man{Colour.ENDC}
+            Well, I guess it's bout time you showed up, ain't it?
+            
+
+            ''')
         
 
         return {
             'start_game': start_game,
             'go_for_lunch': go_for_lunch,
             'go_in_restaurant': go_in_restaurant,
+            'see_the_fam': see_the_fam,
             }   
     ############################################################################
     #############################  END PATHS  ##################################
