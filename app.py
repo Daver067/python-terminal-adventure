@@ -150,17 +150,55 @@ def main():
             ''')
             match show_choices([
                 "Ignore the man", 
-                "\"I was in prison. What did you expect?\"", 
+                "\"I was in prison. Where's my family? Where's my dog?\"", 
                 ]):
                 case "0":
                     player.print_items()
                     if (player.query_item(Dice(6)) or player.query_item(Dice(4))): #! Issue - always returns false
                         delay_print('so its a dice fight then')
                     else:
-                        delay_print('The mysterious man walks up to you, and tosses you a die ')
+                        delay_print('The mysterious man walks up to you, and tosses you a collection of die ')
+                        player.add_item(Dice(6))
+                        player.print_items()
                 case "1":
-                    delay_print('I was expecting you to remember me')
-            delay_print('continue storyline')
+                    delay_print(f'''
+            {Colour.CYAN}MYSTERIOUS MAN{Colour.ENDC}
+            So you were. The apple never falls...
+
+            Nevermind.
+            Your family is gone. Well 'gone' is a bit vague isn't it?
+            That is to say, I have no idea, but they are not here.
+            I imagine you're glad to be home! But I'm afraid 'home' is
+            a bit of a vague word as well! Strictly speaking, this cannot be a home to you, as it no longer belongs to either you, or
+            any member of your family. It belongs to the Bank of
+            Generosity.
+            
+            Now, at the BoG, we believe in living up to our name. I
+            want to see this house back in your hands, so you and your
+            family can get back to 'it', whatever that is.
+
+            I'm going to give you a dice. A standard one, with six
+            sides! If you can roll a six 3 times in a row, you can have
+            the house back. That sounds fair doesn't it?
+
+            If you can't, your only other recourse is to purchase it
+            from the BoG for $3,200,000. You look a little surprised at
+            that valuation. You see, 6 years ago your farm flooded
+            after the river diverted in its direction. As such, the
+            house is considered water-front now. Highly sought after!
+            
+            As discussed, here's your dice. Please kindly roll the dice
+            3 times!
+                    ''')
+                    player.add_item(Dice(6))
+                    player.print_items()
+                    dice = player.query_item(Dice(6))
+                    if(dice):
+                        results = []
+                        for i in range(3):
+                            roll = dice.roll_dice()
+                            results.append(roll)
+                        print(results)
         
 
         return {
@@ -268,6 +306,7 @@ class Player:
         print(f"| {Colour.YELLOW}INVENTORY{Colour.ENDC}                                |")
         length = len("|------------------------------------------|")
         print("|==========================================|")
+        self.items.sort(key=lambda item: item.name)
         for item in self.items:
             char_length = 1 + len(item.name) + len(str(item.quantity)) + 2
             modifier = length - char_length
@@ -275,19 +314,23 @@ class Player:
         print("|==========================================|")
 
     def add_item(self, item: Item, quantity=1):
-        if item in self.items:
+        item_names = []
+        for i in self.items:
+            item_names.append(i.name)
+        if item.name in item_names:
             instance = [item for item in self.items if item.name == item.name][0]
             instance.quantity = instance.quantity + quantity
         else:
             item.quantity = quantity
             self.items.append(item)
 
-    def query_item(self, item): #! ISSUE - see line 157. always returns false.
-        print(f'item: {item} ')
-        print(item in self.items)
-        if item in self.items:
+    def query_item(self, item: Item): #! ISSUE: - see line 157. always returns false.
+        item_names = []
+        for item in self.items:
+            item_names.append(item.name)
+        if item.name in item_names:
             instance = [item for item in self.items if item.name == item.name][0]
-            return True # I think true/false is better for a query? 
+            return instance
         else: 
             # You don't have this item!
             return False
