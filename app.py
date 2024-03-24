@@ -20,6 +20,9 @@ def main():
     player = Player()
     player.set_name(str(delay_input("\nHello Adventurer! What shall I call you?\n")))
 
+
+
+
     ########################################################################
     ###############################  PATHS  ################################
     ########################################################################
@@ -145,6 +148,19 @@ def main():
             
 
             ''')
+            match show_choices([
+                "Ignore the man", 
+                "\"I was in prison. What did you expect?\"", 
+                ]):
+                case "0":
+                    player.print_items()
+                    if (player.query_item(Dice(6)) or player.query_item(Dice(4))): #! Issue - always returns false
+                        delay_print('so its a dice fight then')
+                    else:
+                        delay_print('The mysterious man walks up to you, and tosses you a die ')
+                case "1":
+                    delay_print('I was expecting you to remember me')
+            delay_print('continue storyline')
         
 
         return {
@@ -159,7 +175,29 @@ def main():
 
     # Initiate the paths to be used below... mostly i think they will just link to eachother above though. But now no hoisting issue
     paths = game_paths()
-    paths['start_game']()
+
+
+    ########################################################################
+    ###############################  TEST VALUES  ##########################
+    ########################################################################
+    # To use the testing values, you will need to supply 2 additional command line args:
+    # python3 app.py see_the_fam test  
+    # this will run the game starting at see_the_fam and add anything in this test values area to the player inventory
+    if len(sys.argv) >= 3 and sys.argv[2] =='test':
+        player.add_item(Dice(6))
+
+    ########################################################################
+    ###############################  END TEST VALUES  ######################
+    ########################################################################
+
+    # Checks to see if any other starting point is supplied, and if its valid
+    if len(sys.argv) >= 2:
+        if sys.argv[1] in paths:
+            paths[str(sys.argv[1])]()
+        else:
+            print_error('Developer - Command line args should be: python3 app.py [starting_path]? [test]? \n             Please check spelling of path.')
+    else:
+        paths['start_game']()
 
     return None #! This is the end of main()
 
@@ -244,10 +282,12 @@ class Player:
             item.quantity = quantity
             self.items.append(item)
 
-    def query_item(self, item):
+    def query_item(self, item): #! ISSUE - see line 157. always returns false.
+        print(f'item: {item} ')
+        print(item in self.items)
         if item in self.items:
             instance = [item for item in self.items if item.name == item.name][0]
-            return instance
+            return True # I think true/false is better for a query? 
         else: 
             # You don't have this item!
             return False
