@@ -223,12 +223,12 @@ def main():
     # this will run the game starting at see_the_fam and add anything in this test values area to the player inventory
     if len(sys.argv) >= 3 and sys.argv[2] =='test':
         player.add_item(Dice(6))
-        print(player.query_item(Dice(4)))
-        print(player.boolcheck_items(Dice))
+        player.query_item(Dice(4))
+        player.query_item_weird(Dice(4))
+
 
         print(player.items)
         player.print_items()
-        print(player.query_item(Dice(6)))
 
     ########################################################################
     ###############################  END TEST VALUES  ######################
@@ -331,18 +331,39 @@ class Player:
             self.items.append(item)
 
     def query_item(self, item: Item): #! ISSUE: - see line 157. always returns false.
+        print('\ncorrect query')
         item_names = []
-        for item_loop in self.items: # This had to be changed from item to item_loop, or it caused a name collision below
-            item_names.append(item_loop.name)
+        print(item.name)
+        for self_item in self.items: # This had to be changed from item to item_loop, or it caused a name collision below
+            item_names.append(self_item.name)
         print(f"item_names: {item_names}")
-        print(item.name) # This would ping the item in the for loop above, python scopes weird...
-                         # If you add only a 6 sided dice to inventory, and look for a 4 sided dice, item is the 6 sided dice at this point unless the above variable name is changed. Weird eh?
-        if item.name in item_names: # With the name collision, this would only add dice to the last iterated over dice in the inventory
+        print(item.name) 
+        print('end correct query\n')
+
+        if item.name in item_names: 
             instance = [inventory_item for inventory_item in self.items if inventory_item.name == item.name][0]
             return instance
         else: 
             # You don't have this item!
             return False
+        
+    def query_item_weird(self, item: Item): #! ISSUE: - see line 157. always returns false.
+        print('\nweird query')
+        item_names = []
+        print(item.name)
+        for item in self.items: # This had to be changed from item to item_loop, or it caused a name collision below
+            item_names.append(item.name)
+        print(f"item_names: {item_names}")
+        print(item.name) 
+        print('end weird query\n')
+        if item.name in item_names: 
+            instance = [inventory_item for inventory_item in self.items if inventory_item.name == item.name][0]
+            return instance
+        else: 
+            # You don't have this item!
+            return False
+        
+        
         
         # This one will return True if any instance of the class is in inventory
         # EXAMPLE: if player owns Dice(6) doing a bool_check(Dice) will still be True
