@@ -223,6 +223,12 @@ def main():
     # this will run the game starting at see_the_fam and add anything in this test values area to the player inventory
     if len(sys.argv) >= 3 and sys.argv[2] =='test':
         player.add_item(Dice(6))
+        print(player.query_item(Dice(4)))
+        print(player.boolcheck_items(Dice))
+
+        print(player.items)
+        player.print_items()
+        print(player.query_item(Dice(6)))
 
     ########################################################################
     ###############################  END TEST VALUES  ######################
@@ -249,7 +255,7 @@ class Item:
 
 
 class Dice(Item):
-    def __init__(self, sides) -> None:
+    def __init__(self, sides:int) -> None:
         self.sides = sides
         self.name = f"{sides} - sided dice"
         self.description = "Are you feeling lucky, punk?"
@@ -313,12 +319,12 @@ class Player:
             print(f"| {Colour.GREEN}{item.name}{Colour.ENDC}: {" "*(modifier-3)}{item.quantity} |")
         print("|==========================================|")
 
-    def add_item(self, item: Item, quantity=1):
+    def add_item(self, item:Item, quantity=1):
         item_names = []
         for i in self.items:
             item_names.append(i.name)
         if item.name in item_names:
-            instance = [item for item in self.items if item.name == item.name][0]
+            instance = [inventory_item for inventory_item in self.items if inventory_item.name == item.name][0]
             instance.quantity = instance.quantity + quantity
         else:
             item.quantity = quantity
@@ -326,14 +332,26 @@ class Player:
 
     def query_item(self, item: Item): #! ISSUE: - see line 157. always returns false.
         item_names = []
-        for item in self.items:
-            item_names.append(item.name)
-        if item.name in item_names:
-            instance = [item for item in self.items if item.name == item.name][0]
+        for item_loop in self.items: # This had to be changed from item to item_loop, or it caused a name collision below
+            item_names.append(item_loop.name)
+        print(f"item_names: {item_names}")
+        print(item.name) # This would ping the item in the for loop above, python scopes weird...
+                         # If you add only a 6 sided dice to inventory, and look for a 4 sided dice, item is the 6 sided dice at this point unless the above variable name is changed. Weird eh?
+        if item.name in item_names: # With the name collision, this would only add dice to the last iterated over dice in the inventory
+            instance = [inventory_item for inventory_item in self.items if inventory_item.name == item.name][0]
             return instance
         else: 
             # You don't have this item!
             return False
+        
+        # This one will return True if any instance of the class is in inventory
+        # EXAMPLE: if player owns Dice(6) doing a bool_check(Dice) will still be True
+        #          as there is a Dice Object in inventory. 
+    def boolcheck_items(self, item_class:Item):
+        for inventory_item in self.items:
+            if isinstance(inventory_item, item_class):
+                return True
+        else: return False
 
 
 class Colour:
@@ -415,35 +433,6 @@ def show_choices(options):
 # Helper function for displaying errors
 def print_error(error):
     print(f"\n{Colour.RED}{error}{Colour.ENDC}")
-
-
-# Weird, I don't remember having to specifically place funcs above their
-# invocation in python.... but putting it below the match case didn't work
-
-# Chartley:
-# So, I moved the lunch function out of here. From what I can gather, there is no
-# hoisting in python, like there is in Javascript. The main() function being at
-# the bottom is a convention because this is the python workaround for the lack
-# of hoisting. So, I propose that we keep any reusable functions and classes down
-# below, and any narrative one-time-use functions within main(). So while we work
-#     within main(), we first declare a function, then call it.
-#
-# I also did some other general refactoring so that my linter stopped yelling at
-# me haha. You'll figure it out.
-
-#! Dave:
-#! my issue with declaring a func and then using it makes the script basically read backwards,
-#! when a game like this will need to run unilaterally. Think goosebumps - turn to page 72. now turn to page 13. now 73.
-#! think how it is now, first choice results in choices ABC, which all have to be declared above the initial choice
-#! Then each ABC will have a1 b1 c1 a2 b2 c2...etc which will in turn have to be above... but if c3 links back to b1's
-#! function/storyline you will get an error because c3 function declaration is before b1. 
-#! We need either:
-    #! 1: scope all story routes in global
-    #! 2: scope all story routes in an inner function
-    #! 3: break a rule and use a separate helper module
-#! just thinking about this has already put me into my 30 minute limit haha, I'm going to pull off #2 before i commit
-
-
 
 # End the program with the main function call
 main()
